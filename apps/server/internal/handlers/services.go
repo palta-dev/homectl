@@ -73,7 +73,7 @@ func ServicesHandler(cfg *config.Config, cacheManager *cache.Manager, widgetRegi
 var discoveredServices []config.Service
 if cfg.Settings.Docker != nil && cfg.Settings.Docker.Enabled {
 	log.Printf("[SERVICES] Discovery starting via %s...", cfg.Settings.Docker.Socket)
-	dockerDiscoverer, err := discovery.NewDockerDiscoverer(cfg.Settings.Docker.Socket, cfg.Settings.Docker.LabelPrefix)
+	dockerDiscoverer, err := discovery.NewDockerDiscoverer(cfg.Settings.Docker.Socket, cfg.Settings.Docker.LabelPrefix, cfg.Settings.BaseHost)
 	if err == nil {
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		ds, err := dockerDiscoverer.DiscoverServices(ctx)

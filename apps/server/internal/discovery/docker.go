@@ -15,9 +15,10 @@ import (
 type DockerDiscoverer struct {
 	client      *client.Client
 	labelPrefix string
+	baseHost    string
 }
 
-func NewDockerDiscoverer(socket string, labelPrefix string) (*DockerDiscoverer, error) {
+func NewDockerDiscoverer(socket string, labelPrefix string, baseHost string) (*DockerDiscoverer, error) {
 	var opts []client.Opt
 	if socket != "" {
 		if !strings.HasPrefix(socket, "unix://") {
@@ -39,10 +40,16 @@ func NewDockerDiscoverer(socket string, labelPrefix string) (*DockerDiscoverer, 
 	return &DockerDiscoverer{
 		client:      cli,
 		labelPrefix: labelPrefix,
+		baseHost:    baseHost,
 	}, nil
 }
 
 func (d *DockerDiscoverer) getHostIP() string {
+	// If a host is manually configured, use it
+	if d.baseHost != "" {
+		return d.baseHost
+	}
+
 	// Try to find Tailscale IP first (100.x.y.z)
 	ifaces, err := net.Interfaces()
 	if err == nil {

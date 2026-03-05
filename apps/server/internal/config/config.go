@@ -32,6 +32,7 @@ type Settings struct {
 	Auth                *AuthConfig       `yaml:"auth,omitempty" json:"auth,omitempty"`
 	Docker              *DockerConfig     `yaml:"docker,omitempty" json:"docker,omitempty"`
 	Password            string            `yaml:"password,omitempty" json:"-"` // Hidden from JSON
+	BaseHost            string            `yaml:"baseHost,omitempty" json:"baseHost,omitempty"`
 }
 
 // CacheConfig contains cache settings

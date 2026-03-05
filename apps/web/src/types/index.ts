@@ -12,6 +12,7 @@ export interface ConfigResponse {
   allowHosts?: string[];
   requestTimeout?: string;
   password?: string;
+  baseHost?: string;
   docker?: DockerConfig;
   groups: Group[];
   icons?: IconsConfig;

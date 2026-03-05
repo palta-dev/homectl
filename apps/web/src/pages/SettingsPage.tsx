@@ -23,6 +23,7 @@ export function SettingsPage() {
   const [dockerIgnore, setDockerIgnore] = useState('');
   const [requestTimeout, setRequestTimeout] = useState('10s');
   const [password, setPassword] = useState('');
+  const [baseHost, setBaseHost] = useState('');
   const [groups, setGroups] = useState<Group[]>([]);
 
   useEffect(() => {
@@ -37,6 +38,7 @@ export function SettingsPage() {
       setDockerIgnore(config.docker?.ignore?.join('\n') || '');
       setRequestTimeout(config.requestTimeout || '10s');
       setPassword(''); // Don't load password from server (it's hidden)
+      setBaseHost(config.baseHost || '');
       setGroups(config.groups || []);
       setIsInitialized(true);
     }
@@ -52,6 +54,7 @@ export function SettingsPage() {
         allowHosts: allowHosts.split('\n').filter(h => h.trim() !== ''),
         requestTimeout,
         password: password || undefined, // Only send if changed
+        baseHost,
         groups,
         docker: {
           ...config?.docker,
@@ -338,6 +341,16 @@ export function SettingsPage() {
                   value={requestTimeout}
                   onChange={(e) => setRequestTimeout(e.target.value)}
                 />
+              </div>
+              <div className="field" style={{ gridColumn: '1 / -1' }}>
+                <label>Host IP Override (Tailscale/Public IP)</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g., 100.67.67.67" 
+                  value={baseHost}
+                  onChange={(e) => setBaseHost(e.target.value)}
+                />
+                <p className="hint">If set, all auto-discovered services will use this IP instead of localhost. Perfect for Tailscale.</p>
               </div>
               <div className="field" style={{ gridColumn: '1 / -1' }}>
                 <label>Subnet Scan (optional)</label>
