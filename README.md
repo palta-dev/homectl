@@ -35,6 +35,13 @@ services:
       - "homectl.icon=rocket"
 ```
 
+### 🌐 Remote Access & Tailscale
+
+homectl is built for remote access. 
+
+- **Automatic Detection:** homectl automatically detects if you are running Tailscale and uses your `100.x.y.z` IP for all auto-discovered links.
+- **Manual Override:** You can force a specific IP or domain for all discovered services by setting `Host IP Override` in **Settings > Discovery**.
+
 ## 🛠 Tech Stack
 
 - **Backend**: Go 1.24 (Fiber) - *Optimized for low latency and SSRF safety.*
@@ -80,7 +87,7 @@ docker compose up --build
 
 ### System Monitoring Widgets
 
-Add real-time stats to your header by including them in your `config.yaml`:
+Add real-time stats to your header by including them in your `data/config.yaml`:
 
 ```yaml
 groups:
