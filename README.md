@@ -56,11 +56,17 @@ For full configuration options, widget details, and security guides, visit our d
 
 👉 **[https://palta-dev.github.io/homectl](https://palta-dev.github.io/homectl)**
 
-## Quick Start
+## 🚀 Quick Start
+
+The fastest way to get **homectl** running on your server:
+
+```bash
+curl -sSL https://homectl.xyz/install.sh | sh
+```
 
 ### Docker Compose (Recommended)
 
-**homectl** automatically generates a default configuration if one is missing. Simply mount a persistent `data` folder:
+**homectl** automatically generates a default configuration if one is missing. Simply create a `docker-compose.yml`:
 
 ```yaml
 services:
@@ -74,7 +80,9 @@ services:
     restart: unless-stopped
 ```
 
-### Installation from Source
+## 🛠 Installation from Source (Advanced)
+
+If you wish to modify the code or build your own image:
 
 ```bash
 # Clone the repository
