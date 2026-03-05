@@ -11,9 +11,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./config.yaml:/app/config.yaml
-      - ./data/icons:/data/icons
-      - ./data/db:/app/data/db
+      - ./data:/app/data
       - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - TZ=${TZ:-UTC}

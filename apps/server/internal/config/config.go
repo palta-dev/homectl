@@ -277,6 +277,11 @@ groups:
 // EnsureExists checks if config exists, creates default if not
 func EnsureExists(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
+		// Create parent directories if they don't exist
+		dir := filepath.Dir(path)
+		if err := os.MkdirAll(dir, 0755); err != nil {
+			return fmt.Errorf("creating config directory: %w", err)
+		}
 		return os.WriteFile(path, []byte(defaultYaml), 0644)
 	}
 	return nil

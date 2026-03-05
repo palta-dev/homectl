@@ -82,7 +82,7 @@ RUN mkdir -p /data/icons /data/db && \
 USER root
 
 # Environment variables
-ENV HOMECTL_CONFIG=/app/config.yaml \
+ENV HOMECTL_CONFIG=/app/data/config.yaml \
     TZ=UTC
 
 # Expose port
@@ -94,7 +94,7 @@ HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=10s \
 
 # Entrypoint
 ENTRYPOINT ["./homectl"]
-CMD ["--config", "/app/config.yaml"]
+CMD ["--config", "/app/data/config.yaml"]
 
 # ============================================
 # Debug Image (optional, for development)

@@ -30,7 +30,7 @@ const (
 )
 
 func main() {
-	configPath := flag.String("config", "config.yaml", "Path to configuration file")
+	configPath := flag.String("config", "data/config.yaml", "Path to configuration file")
 	port := flag.Int("port", defaultPort, "Server port")
 	flag.Parse()
 
