@@ -55,7 +55,12 @@ nav:
       - General Settings: configuration/general.md
       - Services & Groups: configuration/services.md
       - Widgets: configuration/widgets.md
+      - YAML Reference: CONFIG_REFERENCE.md
   - Security:
       - Auth & Passwords: security/auth.md
       - SSRF Protection: security/ssrf.md
-  - Development: development.md
+      - Security Policy: SECURITY.md
+  - Project Info:
+      - Architecture: ARCHITECTURE.md
+      - Contributing: CONTRIBUTING.md
+      - Development: development.md

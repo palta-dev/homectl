@@ -2,6 +2,8 @@
 
 > A minimalist, high-performance dashboard for homelab administrators. Fast, sharp, and monochrome.
 
+![Dashboard Screenshot](docs/screenshots/dashboard.png)
+
 ![License](https://img.shields.io/badge/license-MIT-black.svg)
 ![Go](https://img.shields.io/badge/go-1.24-black?logo=go)
 ![React](https://img.shields.io/badge/react-18-black?logo=react)
