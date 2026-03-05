@@ -28,6 +28,13 @@ theme:
     - search.highlight
     - content.code.copy
 
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/palta-dev/homectl
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/r/paltadev/homectl
+
 markdown_extensions:
   - admonition
   - pymdownx.highlight:
