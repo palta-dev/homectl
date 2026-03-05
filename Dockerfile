@@ -8,18 +8,21 @@ ARG BUILD_DATE
 # Frontend Build Stage
 # ============================================
 FROM node:20-alpine AS frontend-build
+WORKDIR /app
+
+# Copy shared package first
+COPY packages/shared/package*.json ./packages/shared/
+# Copy web package
+COPY apps/web/package*.json ./apps/web/
+
+# Install dependencies (using --workspace for monorepos if needed, but here simple install)
+# Since we are not using a root package.json for npm workspaces, we'll install separately
 WORKDIR /app/apps/web
-
-# Copy package files
-COPY apps/web/package*.json ./
-COPY packages/shared/package*.json ../packages/shared/
-
-# Install dependencies
 RUN npm install
 
 # Copy source code
-COPY apps/web/ ./
-COPY packages/shared/ ../packages/shared/
+COPY packages/shared/ /app/packages/shared/
+COPY apps/web/ /app/apps/web/
 
 # Build frontend
 RUN npm run build
@@ -28,7 +31,7 @@ RUN npm run build
 # Backend Build Stage
 # ============================================
 FROM golang:1.24-alpine AS backend-build
-WORKDIR /app
+WORKDIR /app/apps/server
 
 # Install build dependencies
 RUN apk add --no-cache git ca-certificates
@@ -40,14 +43,14 @@ COPY apps/server/go.mod apps/server/go.sum* ./
 RUN go mod download
 
 # Copy source code
-COPY apps/server/ ./
+COPY apps/server/ .
 
 # Build backend with optimizations
 ARG VERSION
 ARG BUILD_DATE
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
     -ldflags="-w -s -X main.version=${VERSION} -X main.buildDate=${BUILD_DATE}" \
-    -o homectl \
+    -o /app/homectl \
     ./cmd
 
 # ============================================
@@ -75,8 +78,8 @@ COPY --from=backend-build --chown=homectl:homectl \
     /app/homectl ./
 
 # Create data directories
-RUN mkdir -p /data/icons /data/db && \
-    chown -R homectl:homectl /app /data
+RUN mkdir -p /app/data/icons /app/data/db && \
+    chown -R homectl:homectl /app
 
 # Switch to root user for system stats and docker socket access
 USER root
@@ -95,11 +98,3 @@ HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=10s \
 # Entrypoint
 ENTRYPOINT ["./homectl"]
 CMD ["--config", "/app/data/config.yaml"]
-
-# ============================================
-# Debug Image (optional, for development)
-# ============================================
-FROM production AS debug
-USER root
-RUN apk add --no-cache curl vim net-tools
-USER homectl
