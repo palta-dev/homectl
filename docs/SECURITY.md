@@ -228,7 +228,7 @@ ufw deny 8080
 
 ## Reporting Vulnerabilities
 
-Please report security vulnerabilities to: security@homectl.dev
+Please report security vulnerabilities to: security@homectl.xyz
 
 **Do not** create public GitHub issues for security vulnerabilities.
 
