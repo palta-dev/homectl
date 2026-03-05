@@ -11,15 +11,41 @@
 
 homectl is a technical, distraction-free dashboard designed for power users. It features a sharp, monochrome aesthetic, native Docker auto-discovery, and real-time system monitoring.
 
-### Key Features
+## 🚀 Advanced Setup
 
-| Feature | homectl |
-|---------|---------|
-| **Monochrome UI** | Minimalist technical design with zero distractions. |
-| **System Health** | Real-time CPU, RAM, Disk, and Temp monitoring in the header. |
-| **Docker Discovery** | Native container discovery via Docker socket. |
-| **Performance** | < 50MB RSS memory usage and instant loads. |
-| **Backgrounds** | Dynamic Unsplash/URL backgrounds with adjustable tint levels. |
+### Reverse Proxy (Recommended)
+
+To access your dashboard securely over the internet, we recommend using a reverse proxy like **Nginx Proxy Manager** or **Traefik** with Let's Encrypt SSL.
+
+1. Point your domain (e.g., `dash.example.com`) to your VPS.
+2. Configure the proxy to point to `http://<vps-ip>:8080`.
+3. Enable "Websockets Support" and "Force SSL".
+
+### Docker Auto-Discovery
+
+homectl can automatically find containers. Label your other containers to customize how they appear:
+
+```yaml
+services:
+  my-app:
+    image: my-app:latest
+    labels:
+      - "homectl.name=My Application"
+      - "homectl.url=https://app.example.com"
+      - "homectl.icon=rocket"
+```
+
+## 🛠 Tech Stack
+
+- **Backend**: Go 1.24 (Fiber) - *Optimized for low latency and SSRF safety.*
+- **Frontend**: React 18 (Vite, TypeScript) - *Fast, reactive, and type-safe.*
+- **Security**: Bcrypt hashing, session-based auth, and hardened HTTP clients.
+
+## 📖 Documentation
+
+For full configuration options, widget details, and security guides, visit our documentation site:
+
+👉 **[https://palta-dev.github.io/homectl](https://palta-dev.github.io/homectl)**
 
 ## Quick Start
 

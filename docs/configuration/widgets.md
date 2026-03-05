@@ -27,7 +27,7 @@ widgets:
 
 ## HTTP JSON Widget
 
-Fetches a JSON endpoint and extracts a value using GJSON syntax.
+Fetches a JSON endpoint and extracts a value using [GJSON syntax](https://github.com/tidwall/gjson).
 
 ```yaml
 widgets:
@@ -35,15 +35,27 @@ widgets:
     url: "https://api.example.com/stats"
     jsonPath: "data.active_users"
     label: "Users"
+    format: "raw"
 ```
 
-## HTTP Status Widget
+### Formatting Options
+- `raw`: Default. Displays the value as-is.
+- `bytes`: Converts numbers to human-readable sizes (e.g., `1.2 GB`).
+- `duration`: Converts milliseconds to time (e.g., `5.2s`).
+- `percent`: Appends `%` to the number.
 
-Simply monitors the status code and latency of a URL.
+## HTTP HTML Widget
+
+Scrapes text from an HTML page using CSS selectors.
 
 ```yaml
 widgets:
-  - type: httpStatus
-    url: "https://google.com"
-    label: "Google"
+  - type: httpHtml
+    url: "https://status.myapp.com"
+    selector: ".status-text"
+    label: "Status"
 ```
+
+### Scraper Options
+- `selector`: A CSS selector (e.g., `#main > .status`).
+- `attribute`: (Optional) Extract an attribute value instead of inner text (e.g., `title` or `src`).
