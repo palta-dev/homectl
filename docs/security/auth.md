@@ -4,12 +4,16 @@
 
 ## Session-Based Authentication
 
-Settings are protected by a password system. When a password is set in `config.yaml`, the Settings page is hidden behind a login screen.
+**homectl** features a dedicated login system to protect your configuration. When a password is set, the Settings page is inaccessible until you authenticate.
 
-### Setting a Password
-1. Navigate to **Settings > Security**.
-2. Enter your desired password and click **Update Password**.
-3. The server will hash your password using **bcrypt** and save it to your config.
+### How it works
+1. **Initial Setup:** When you first deploy, the dashboard is open.
+2. **Setting a Password:** Go to **Settings > Security**, enter a new password, and save.
+3. **Protection:** The server hashes your password using **bcrypt** and saves it to `data/config.yaml`.
+4. **Login:** Subsequent visits to the Settings page will redirect you to a secure login screen. Your session is maintained in your browser so you only have to log in once.
+
+### Recovery
+If you forget your password, you can manually clear the `password` field in `data/config.yaml` and restart the server to restore access.
 
 ## SSRF Protection
 

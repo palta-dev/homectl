@@ -14,7 +14,14 @@ The **homectl** backend automatically scans your server for Tailscale. If it det
 ### Setup
 1. Install Tailscale on your server and your client device.
 2. Log in to both.
-3. Access your dashboard using the server's Tailscale IP. All links will now point to that same IP and work perfectly.
+3. Access your dashboard using the server's Tailscale IP. 
+
+### Manual Override (Priority)
+If automatic detection fails or you want to use a specific IP for all services:
+1. Go to **Settings > Discovery**.
+2. Enter your IP (e.g., `100.67.67.67`) into the **Host IP Override** field.
+3. Click **Save & Rescan**.
+4. Every discovered Docker container will now use this IP for its generated URL.
 
 ---
 

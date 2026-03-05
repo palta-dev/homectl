@@ -1,6 +1,6 @@
 # General Settings
 
-The `settings` block in `config.yaml` controls the global behavior and appearance of your dashboard.
+The `settings` block in `data/config.yaml` controls the global behavior and appearance of your dashboard.
 
 ```yaml
 settings:

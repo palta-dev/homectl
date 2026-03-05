@@ -51,19 +51,17 @@ For full configuration options, widget details, and security guides, visit our d
 
 ### Docker Compose (Recommended)
 
+**homectl** automatically generates a default configuration if one is missing. Simply mount a persistent `data` folder:
+
 ```yaml
 services:
   homectl:
     image: ghcr.io/palta-dev/homectl:latest
     container_name: homectl
-    ports:
-      - "8080:8080"
+    network_mode: host # Recommended for Tailscale detection
     volumes:
-      - ./config.yaml:/app/config.yaml:ro
-      - ./data:/data
-      - /var/run/docker.sock:/var/run/docker.sock:ro # Required for auto-discovery
-    environment:
-      - TZ=UTC
+      - ./data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     restart: unless-stopped
 ```
 
