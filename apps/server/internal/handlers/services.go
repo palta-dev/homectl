@@ -10,6 +10,7 @@ import (
 	"github.com/palta-dev/homectl/apps/server/internal/config"
 	"github.com/palta-dev/homectl/apps/server/internal/discovery"
 	"github.com/palta-dev/homectl/apps/server/internal/widgets"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // ServicesResponse represents the services API response
@@ -61,6 +62,34 @@ type WidgetResult struct {
 // ServicesHandler returns services with their current status
 func ServicesHandler(cfg *config.Config, cacheManager *cache.Manager, widgetRegistry *widgets.Registry) fiber.Handler {
 	return func(c *fiber.Ctx) error {
+		// Determine authentication status
+		isAuthenticated := false
+		if cfg.Settings.Password != "" {
+			authHeader := c.Get("X-HOMECTL-AUTH")
+			authCookie := c.Cookies("homectl_auth")
+			
+			passwordProvided := authHeader
+			if passwordProvided == "" {
+				passwordProvided = authCookie
+			}
+
+			if passwordProvided != "" {
+				err := bcrypt.CompareHashAndPassword([]byte(cfg.Settings.Password), []byte(passwordProvided))
+				if err == nil {
+					isAuthenticated = true
+				}
+			}
+		} else {
+			// If no password set, everything is public
+			isAuthenticated = true
+		}
+
+		if !isAuthenticated {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"error": "Unauthorized: Password required",
+			})
+		}
+
 		// Try cache first
 		cacheKey := "services:all"
 		if cached, ok := cacheManager.Get(cacheKey); ok {

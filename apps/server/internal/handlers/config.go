@@ -47,8 +47,34 @@ type ServiceResponse struct {
 // ConfigHandler returns the sanitized configuration
 func ConfigHandler(cfg *config.Config, cacheManager *cache.Manager) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Try cache first
-		cacheKey := "config:response"
+		// Determine authentication status
+		isAuthenticated := false
+		if cfg.Settings.Password != "" {
+			authHeader := c.Get("X-HOMECTL-AUTH")
+			authCookie := c.Cookies("homectl_auth")
+			
+			passwordProvided := authHeader
+			if passwordProvided == "" {
+				passwordProvided = authCookie
+			}
+
+			if passwordProvided != "" {
+				err := bcrypt.CompareHashAndPassword([]byte(cfg.Settings.Password), []byte(passwordProvided))
+				if err == nil {
+					isAuthenticated = true
+				}
+			}
+		} else {
+			// If no password set, everything is public
+			isAuthenticated = true
+		}
+
+		// Try cache first (cache separate results for auth/unauth)
+		cacheKey := "config:response:unauth"
+		if isAuthenticated {
+			cacheKey = "config:response:auth"
+		}
+
 		if cached, ok := cacheManager.Get(cacheKey); ok {
 			return c.JSON(cached)
 		}
@@ -59,36 +85,39 @@ func ConfigHandler(cfg *config.Config, cacheManager *cache.Manager) fiber.Handle
 			Theme:             cfg.Settings.Theme,
 			Background:        cfg.Settings.Background,
 			BackgroundOpacity: cfg.Settings.BackgroundOpacity,
-			AllowHosts:        cfg.Settings.AllowHosts,
-			RequestTimeout:    cfg.Settings.RequestTimeout,
-			Docker:            cfg.Settings.Docker,
-			Groups:            make([]GroupResponse, len(cfg.Groups)),
-			Icons:             cfg.Icons,
 			PasswordProtected: cfg.Settings.Password != "",
 		}
 
-		for i, group := range cfg.Groups {
-			gResp := GroupResponse{
-				Name:      group.Name,
-				Layout:    group.Layout,
-				Collapsed: group.Collapsed,
-				Services:  make([]ServiceResponse, len(group.Services)),
-			}
+		// Only include sensitive network/discovery/service data if authenticated
+		if isAuthenticated {
+			response.AllowHosts = cfg.Settings.AllowHosts
+			response.RequestTimeout = cfg.Settings.RequestTimeout
+			response.Docker = cfg.Settings.Docker
+			response.Icons = cfg.Icons
+			response.Groups = make([]GroupResponse, len(cfg.Groups))
 
-			for j, svc := range group.Services {
-				gResp.Services[j] = ServiceResponse{
-					Name:        svc.Name,
-					URL:         svc.URL,
-					Icon:        svc.Icon,
-					Description: svc.Description,
-					Tags:        svc.Tags,
-					NewTab:      svc.NewTab,
-					PingEnabled: svc.PingEnabled,
-					Widgets:     svc.Widgets,
+			for i, group := range cfg.Groups {
+				gResp := GroupResponse{
+					Name:      group.Name,
+					Layout:    group.Layout,
+					Collapsed: group.Collapsed,
+					Services:  make([]ServiceResponse, len(group.Services)),
 				}
-			}
 
-			response.Groups[i] = gResp
+				for j, svc := range group.Services {
+					gResp.Services[j] = ServiceResponse{
+						Name:        svc.Name,
+						URL:         svc.URL,
+						Icon:        svc.Icon,
+						Description: svc.Description,
+						Tags:        svc.Tags,
+						NewTab:      svc.NewTab,
+						PingEnabled: svc.PingEnabled,
+						Widgets:     svc.Widgets,
+					}
+				}
+				response.Groups[i] = gResp
+			}
 		}
 
 		// Cache for 5 seconds
