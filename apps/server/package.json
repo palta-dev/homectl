@@ -1,0 +1,15 @@
+{
+  "name": "@homectl/server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "cd cmd && go run main.go --config ../../../config.yaml",
+    "build": "cd cmd && go build -o ../homectl",
+    "test": "go test ./...",
+    "lint": "echo 'No linter configured for server' && exit 0"
+  },
+  "devDependencies": {
+    "yaml": "^2.3.4"
+  }
+}

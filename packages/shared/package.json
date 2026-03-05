@@ -1,0 +1,20 @@
+{
+  "name": "@homectl/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./schema/index.ts",
+  "types": "./schema/index.ts",
+  "exports": {
+    ".": "./schema/index.ts",
+    "./types": "./types/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint . --ext ts,tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "eslint": "^8.56.0"
+  }
+}

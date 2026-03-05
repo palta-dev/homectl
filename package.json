@@ -1,0 +1,32 @@
+{
+  "name": "homectl",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A self-hosted homepage/dashboard for homelab administrators",
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n web,server -c cyan,yellow \"npm run dev:web\" \"npm run dev:server\"",
+    "dev:web": "npm run dev --workspace=apps/web",
+    "dev:server": "npm run dev --workspace=apps/server",
+    "build": "npm run build --workspaces",
+    "build:web": "npm run build --workspace=apps/web",
+    "build:server": "npm run build --workspace=apps/server",
+    "test": "npm run test --workspace=@homectl/web && npm run test --workspace=@homectl/server",
+    "test:web": "npm run test --workspace=@homectl/web",
+    "test:server": "cd apps/server && go test ./...",
+    "lint": "npm run lint --workspaces",
+    "typecheck": "npm run typecheck --workspace=apps/web"
+  },
+  "workspaces": [
+    "apps/web",
+    "apps/server",
+    "packages/shared"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "npm@10.0.0"
+}

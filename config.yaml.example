@@ -1,0 +1,162 @@
+# homectl Configuration Example
+# See docs/CONFIG_REFERENCE.md for full documentation
+
+version: 1
+
+settings:
+  # Dashboard title (shown in browser tab)
+  title: "Home Lab"
+  
+  # Default theme: "dark" or "light"
+  theme: "dark"
+  
+  # Allowed hosts/networks for outbound requests (SSRF protection)
+  # Supports: CIDR notation, hostnames, single IPs
+  allowHosts:
+    - "192.168.0.0/16"
+    - "10.0.0.0/8"
+    - "grafana"
+    - "prometheus"
+  
+  # Block cloud metadata endpoints (169.254.169.254, etc.)
+  blockPrivateMetaIPs: true
+  
+  # Request timeout for health checks and widgets
+  requestTimeout: "10s"
+  
+  # Cache configuration
+  cache:
+    defaultTTL: 30        # Default TTL in seconds
+    maxEntries: 500       # Maximum cache entries
+  
+  # Optional authentication (disabled by default)
+  # auth:
+  #   enabled: false
+  #   provider: "local"  # local, github, google
+  #   session:
+  #     maxAge: "24h"
+  #   # For GitHub OAuth:
+  #   github:
+  #     clientId: "${GITHUB_CLIENT_ID}"
+  #     clientSecret: "${GITHUB_CLIENT_SECRET}"
+  #     allowedUsers:
+  #       - "your-username"
+  
+  # Optional Docker auto-discovery (security risk!)
+  # docker:
+  #   enabled: false
+  #   socket: "/var/run/docker.sock"
+  #   labelPrefix: "homectl"
+
+# Service groups
+groups:
+  - name: "Monitoring"
+    layout: "grid"      # grid, list, compact
+    collapsed: false    # Start collapsed
+    
+    services:
+      - name: "Grafana"
+        url: "http://grafana:3000"
+        icon: "grafana"
+        description: "Metrics and dashboards"
+        tags:
+          - "monitoring"
+          - "critical"
+        newTab: true    # Open in new tab
+        
+        # Health checks
+        checks:
+          - type: "http"
+            url: "http://grafana:3000/api/health"
+            method: "GET"
+            expectStatus: 200
+            intervalSeconds: 30
+            timeout: "5s"
+            retries: 2
+        
+        # Widgets (display live data)
+        widgets:
+          - type: "httpJson"
+            url: "http://grafana:3000/api/health"
+            jsonPath: "$.database"
+            label: "DB"
+            format: "status"  # status, bytes, duration, raw, percent
+            cacheTTL: 120
+
+      - name: "Prometheus"
+        url: "http://prometheus:9090"
+        icon: "prometheus"
+        description: "Time-series database"
+        checks:
+          - type: "http"
+            url: "http://prometheus:9090/-/healthy"
+            expectStatus: 200
+            intervalSeconds: 30
+
+  - name: "Infrastructure"
+    layout: "grid"
+    
+    services:
+      - name: "Portainer"
+        url: "http://portainer:9000"
+        icon: "docker"
+        description: "Container management"
+        checks:
+          - type: "tcp"
+            host: "portainer"
+            port: 9000
+            timeout: "3s"
+            intervalSeconds: 30
+
+      - name: "Home Assistant"
+        url: "http://hass:8123"
+        icon: "home-assistant"
+        description: "Home automation"
+        checks:
+          - type: "http"
+            url: "http://hass:8123/api/config"
+            headers:
+              Authorization: "Bearer ${HASS_TOKEN}"
+            expectStatus: 200
+
+  - name: "Network"
+    layout: "list"
+    
+    services:
+      - name: "Router"
+        url: "http://192.168.1.1"
+        icon: "router"
+        description: "Main gateway"
+        pingEnabled: true  # Show ping latency
+        checks:
+          - type: "ping"
+            host: "192.168.1.1"
+            count: 3
+            intervalSeconds: 60
+
+      - name: "DNS Server"
+        url: "http://pihole:80"
+        icon: "pi-hole"
+        description: "Network-wide ad blocking"
+        checks:
+          - type: "tcp"
+            host: "pihole"
+            port: 53
+            intervalSeconds: 30
+
+# Icon configuration
+icons:
+  sources:
+    # Local icons directory
+    - type: "local"
+      path: "/data/icons"
+    
+    # Simple Icons (3000+ brand icons)
+    - type: "simpleicons"
+      cache: true
+      cacheTTL: 86400  # 24 hours
+    
+    # Custom URL source
+    # - type: "url"
+    #   baseUrl: "https://icons.example.com"
+    #   pathTemplate: "/{name}.svg"

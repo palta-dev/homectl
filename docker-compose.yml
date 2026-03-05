@@ -1,0 +1,26 @@
+services:
+  homectl:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: homectl:latest
+    container_name: homectl
+    user: root
+    ports:
+      - "8080:8080"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./config.yaml:/app/config.yaml
+      - ./data/icons:/data/icons
+      - ./data/db:/app/data/db
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - TZ=${TZ:-UTC}
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost:8080/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped

@@ -1,0 +1,56 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+*.exe
+*.test
+
+# Runtime data
+data/db/*.db
+data/db/*.db-shm
+data/db/*.db-wal
+*.sqlite
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (keep example, ignore actual)
+config.yaml
+!config.yaml.example
+
+# Secrets
+*.pem
+*.key
+secrets/
+
+# Docker
+docker-compose.override.yml
+
+# Test coverage
+coverage/
+
+# Temporary
+tmp/
+temp/
+.cache/
