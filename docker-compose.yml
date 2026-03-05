@@ -3,11 +3,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: homectl:latest
+    image: ghcr.io/palta-dev/homectl:latest
     container_name: homectl
     user: root
-    ports:
-      - "8080:8080"
+    network_mode: host
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
