@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"net"
 	"strings"
 
 	"github.com/docker/docker/api/types/container"
@@ -41,6 +42,33 @@ func NewDockerDiscoverer(socket string, labelPrefix string) (*DockerDiscoverer, 
 	}, nil
 }
 
+func (d *DockerDiscoverer) getHostIP() string {
+	// Try to find Tailscale IP first (100.x.y.z)
+	ifaces, err := net.Interfaces()
+	if err == nil {
+		for _, i := range ifaces {
+			// Look for tailscale interface or common VPN tun names
+			if strings.Contains(i.Name, "tailscale") || strings.Contains(i.Name, "utun") || strings.Contains(i.Name, "wg") {
+				addrs, _ := i.Addrs()
+				for _, addr := range addrs {
+					var ip net.IP
+					switch v := addr.(type) {
+					case *net.IPNet:
+						ip = v.IP
+					case *net.IPAddr:
+						ip = v.IP
+					}
+					if ip != nil && ip.To4() != nil && strings.HasPrefix(ip.String(), "100.") {
+						log.Printf("[DOCKER] Detected Tailscale IP: %s", ip.String())
+						return ip.String()
+					}
+				}
+			}
+		}
+	}
+	return "localhost"
+}
+
 func (d *DockerDiscoverer) DiscoverServices(ctx context.Context) ([]config.Service, error) {
 	containers, err := d.client.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
@@ -75,11 +103,13 @@ func (d *DockerDiscoverer) DiscoverServices(ctx context.Context) ([]config.Servi
 		var service config.Service
 		service.Name = name
 		
-		// If it's running and has a port, use localhost. Otherwise, just a placeholder or no URL.
+		hostIP := d.getHostIP()
+
+		// If it's running and has a port, use host IP. Otherwise, just a placeholder.
 		if port != 0 {
-			service.URL = fmt.Sprintf("http://localhost:%d", port)
+			service.URL = fmt.Sprintf("http://%s:%d", hostIP, port)
 		} else {
-			service.URL = "#" // Placeholder for stopped/unmapped containers
+			service.URL = "#" 
 		}
 
 		service.Tags = []string{"docker", container.State}

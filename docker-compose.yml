@@ -22,3 +22,25 @@ services:
       retries: 3
       start_period: 10s
     restart: unless-stopped
+
+  # OPTIONAL: Tailscale Sidecar
+  # To use: 
+  # 1. Uncomment the block below
+  # 2. Add TS_AUTHKEY to your environment
+  # 3. This will make your dashboard accessible at http://homectl.<your-tailnet>.ts.net
+  #
+  # tailscale:
+  #   image: tailscale/tailscale:latest
+  #   container_name: homectl-tailscale
+  #   hostname: homectl
+  #   environment:
+  #     - TS_AUTHKEY=${TS_AUTHKEY}
+  #     - TS_STATE_DIR=/var/lib/tailscale
+  #   volumes:
+  #     - ./data/tailscale:/var/lib/tailscale
+  #     - /dev/net/tun:/dev/net/tun
+  #   cap_add:
+  #     - NET_ADMIN
+  #     - SYS_MODULE
+  #   restart: unless-stopped
+
